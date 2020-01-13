@@ -10,6 +10,7 @@ $(function(){
         $('#display').append(data);
     });
 
+    
     //пушим в массив с операциями
     $('.degree').on('click', function(){
         operation.push('deg');
@@ -35,9 +36,8 @@ $(function(){
     })
 
     //выводим результат
-    //на данный момент не реализован приоритет операций согласно математическим правилам
     $('.result').on('click', function(){
-        let result;
+        let count =0;
         //заполнили массив числами с дисплея
         numbers = $('#display').text().split(/\D/);
         // удаляю 22 первых элемента в массиве которые не ясно от куда берутся
@@ -45,50 +45,59 @@ $(function(){
         console.log(numbers);
         console.log(operation)
         //-----------------------------------------------------------------------------------
-        // for(let i=0; i<operation.length; i++){
-        //     //если это не первый проход цыкла
-        //     if(i>0){
-        //         switch(operation[i]){
-        //             case 'deg':
-        //             result = result/Number(numbers[i+1]);
-        //             break;
-        //             case 'multi':
-        //                     result = result*Number(numbers[i+1]);
-        //             break;
-        //             case 'subt':
-        //                 result = result-Number(numbers[i+1]);
-        //             break;
-        //             case 'sum':
-        //                 result = result+Number(numbers[i+1]);
-        //             break;  
-        //         };
-        //     //при первом проходе цыкла
-        //     } else {
-        //         switch(operation[i]){
-        //             case 'deg':
-        //             result = Number(numbers[i])/Number(numbers[i+1]);
-        //             break;
-        //             case 'multi':
-        //                     result = Number(numbers[i])*Number(numbers[i+1]);
-        //             break;
-        //             case 'subt':
-        //                 result = Number(numbers[i])-Number(numbers[i+1]);
-        //             break;
-        //             case 'sum':
-        //                 result = Number(numbers[i])+Number(numbers[i+1]);
-        //             break;  
-        //         };
-        //     }
-        // }
-        // $('#display').append('='+result);
-           // console.log(operation)
-           //-----------------------------------------------------------------------------------
-        
         for(let i=0; i<operation.length; i++){
+            if(operation[i] === 'multi'){
+                if(operation[i-1] !== 'sum' && operation[i-1] !== 'subt') {
+                    numbers.splice(i, 2, numbers[i]*numbers[i+1]);
+                    operation.splice(i, 1);
+                    i--
+                } else {
+                    numbers.splice(i, 2, numbers[i]*numbers[i+1]);
+                    operation.splice(i, 1);
+                    i--
+                }   
+            }
             if(operation[i] === 'deg'){
-                prom.push(numbers[i]/numbers[i+1]);
-                
+                if(operation[i-1] !== 'sum' && operation[i-1] !== 'subt') {
+                    numbers.splice(i, 2, numbers[i]/numbers[i+1]);
+                    operation.splice(i, 1);
+                    i--
+                } else {
+                    numbers.splice(i, 2, numbers[i]/numbers[i+1]);
+                    operation.splice(i, 1);
+                    i--
+                }
             }
         }
+
+        let result = 0;
+
+        for (let i = 0; i < operation.length; i++) {
+            if (count === 0) {
+                if (operation[i] === 'sum'){
+                    result = (+numbers[i])+(+numbers[i+1]);
+                }
+                if (operation[i] === 'subt'){
+                    result = (+numbers[i]) - (+numbers[i+1]);
+                }
+            }
+
+            if (count !== 0) {
+                if (operation[i] === 'sum'){
+                    result = (+result)+(+numbers[i+1]);
+                }
+                if (operation[i] === 'subt'){
+                    result = (+result) - (+numbers[i+1]);
+                }
+            }
+            count++
+        }
+        if (numbers.length === 1) {
+            result = numbers[0]
+        }
+        console.log(numbers);
+        console.log(operation)
+        console.log(result)
+        $('#display').append('='+result);
     })
 })
